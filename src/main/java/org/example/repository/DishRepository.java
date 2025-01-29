@@ -1,7 +1,7 @@
 package org.example.repository;
 
 import org.example.model.Dish;
-import org.example.model.Table;
+
 import org.example.view.components.rezerwacje.ReservationPanel;
 
 import javax.swing.table.AbstractTableModel;
@@ -17,7 +17,6 @@ public class DishTableModel extends AbstractTableModel {
     public void reservation(ReservationPanel reservationPanel){
         this.reservationPanel = reservationPanel;
     }
-
 
 
     @Override
@@ -52,7 +51,6 @@ public class DishTableModel extends AbstractTableModel {
         fireTableRowsInserted(dishes.size() - 1, dishes.size() - 1);
     }
 
-    // Poprawnie dodana metoda removeDish w ramach istniejącej klasy
     public void removeDish(int rowIndex) {
         if (rowIndex >= 0 && rowIndex < dishes.size()) {
             dishes.remove(rowIndex);
