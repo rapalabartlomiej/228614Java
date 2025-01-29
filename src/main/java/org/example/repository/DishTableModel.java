@@ -1,6 +1,7 @@
 package org.example.repository;
 
 import org.example.model.Dish;
+import org.example.model.Table;
 import org.example.view.components.rezerwacje.ReservationPanel;
 
 import javax.swing.table.AbstractTableModel;
@@ -10,7 +11,7 @@ import java.util.List;
 public class DishTableModel extends AbstractTableModel {
     private final String[] columnNames = {"Nazwa dania", "Cena (zł)", "Opis"};
     private final List<Dish> dishes = new ArrayList<>();
-    public ReservationPanel reservationPanel;
+    private ReservationPanel reservationPanel;
 
 
     public void reservation(ReservationPanel reservationPanel){
@@ -57,5 +58,8 @@ public class DishTableModel extends AbstractTableModel {
             dishes.remove(rowIndex);
             fireTableRowsDeleted(rowIndex, rowIndex);
         }
+    }
+    public List<Dish> getDishList() {
+        return new ArrayList<>(dishes);
     }
 }

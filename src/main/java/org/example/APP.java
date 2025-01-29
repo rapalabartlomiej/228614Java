@@ -30,7 +30,7 @@ public class APP {
 
 
 
-            ReservationPanel reservationPanel = new ReservationPanel(TableREPOSITORY);
+            ReservationPanel reservationPanel = new ReservationPanel(TableREPOSITORY,dishTableModel);
 
             TableREPOSITORY.reservation(reservationPanel);
             dishTableModel.reservation(reservationPanel);

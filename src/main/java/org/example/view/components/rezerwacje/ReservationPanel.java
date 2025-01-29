@@ -1,8 +1,10 @@
 package org.example.view.components.rezerwacje;
 
 import org.example.logic.ReservationManager;
+import org.example.model.Dish;
 import org.example.model.Reservation;
 import org.example.model.Table;
+import org.example.repository.DishTableModel;
 import org.example.repository.ReservationTableModel;
 import org.example.repository.TableREPOSITORY;
 
@@ -23,19 +25,30 @@ public class ReservationPanel extends JPanel {
     private final JTextField customerField = new JTextField(20);
     private final ReservationTableModel reservationTableModel;
     private final DefaultComboBoxModel<Table> tableComboBoxModel;
+    private final DishTableModel dishModel;
+    private DefaultComboBoxModel<Dish> dishComboBoxModel;
+    private final JComboBox<Dish> dishComboBox;
 
 
-    public ReservationPanel(TableREPOSITORY tableModel) {
+    public ReservationPanel(TableREPOSITORY tableModel, DishTableModel dishTableModel) {
+        this.reservationTableModel = new ReservationTableModel(reservationManager);
+
+
         this.tableModel = tableModel;
-        this.reservationTableModel = new ReservationTableModel(reservationManager); // Inicjalizacja modelu tabeli rezerwacji
         this.tableComboBoxModel = new DefaultComboBoxModel<>(tableModel.getTables().toArray(new Table[0]));
         this.tableComboBox = new JComboBox<>(tableComboBoxModel);
+
+        this.dishModel = dishTableModel;
+        this.dishComboBoxModel = new DefaultComboBoxModel<>(dishModel.getDishList().toArray(new Dish[0]));
+        this.dishComboBox = new JComboBox<>(dishComboBoxModel);
+
 
         configureComponents();
         buildLayout();
     }
     public void update(){
         tableComboBox.setModel(new DefaultComboBoxModel<>(tableModel.getTables().toArray(new Table[0])));
+        dishComboBox.setModel(new DefaultComboBoxModel<>(dishModel.getDishList().toArray(new Dish[0])));
     }
 
     private void configureComponents() {
@@ -54,6 +67,16 @@ public class ReservationPanel extends JPanel {
                 return super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
             }
         });
+        dishComboBox.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                if (value instanceof Dish) {
+                    Dish dish = (Dish) value;
+                    value = "danie:" + dish.getName();
+                }
+                return super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+            }
+        });
 
         // Ustaw domyślny stolik, jeśli lista nie jest pusta
         if (!tableModel.getTables().isEmpty()) {
@@ -66,12 +89,13 @@ public class ReservationPanel extends JPanel {
         setBorder(BorderFactory.createTitledBorder("Rezerwacje"));
 
         // Panel formularza
-        JPanel formPanel = new JPanel(new GridLayout(5, 2, 5, 5));
+        JPanel formPanel = new JPanel(new GridLayout(6, 2, 5, 5));
         formPanel.add(new JLabel("Stolik:")); formPanel.add(tableComboBox);
         formPanel.add(new JLabel("Data:")); formPanel.add(dateSpinner);
         formPanel.add(new JLabel("Godzina:")); formPanel.add(timeSpinner);
         formPanel.add(new JLabel("Czas trwania (h):")); formPanel.add(durationField);
         formPanel.add(new JLabel("Klient:")); formPanel.add(customerField);
+        formPanel.add(new JLabel("Danie:")); formPanel.add(dishComboBox);
 
         // Przycisk dodawania rezerwacji
         JButton addButton = new JButton("Dodaj rezerwację");
@@ -100,6 +124,9 @@ public class ReservationPanel extends JPanel {
                 return;
             }
 
+            dishComboBox.setModel(new DefaultComboBoxModel<>(dishModel.getDishList().toArray(new Dish[0])));
+            Dish dish = (Dish) dishComboBox.getSelectedItem();
+
             // Pobierz datę i godzinę
             LocalDateTime start = LocalDateTime.of(
                     ((java.util.Date) dateSpinner.getValue()).toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate(),
@@ -117,7 +144,7 @@ public class ReservationPanel extends JPanel {
             }
 
             // Dodaj rezerwację
-            reservationManager.addReservation(new Reservation(start, start.plusHours(duration), table, customer));
+            reservationManager.addReservation(new Reservation(start, start.plusHours(duration), table, customer,dish));
             reservationTableModel.fireTableDataChanged(); // Powiadom tabelę o zmianach
 
             // Odśwież widok tabeli
@@ -128,7 +155,7 @@ public class ReservationPanel extends JPanel {
             clearForm();
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this, "Nieprawidłowe dane!", "Błąd", JOptionPane.ERROR_MESSAGE);
-            ex.printStackTrace(); // Debugowanie: wypisz błąd
+
         }
     }
 

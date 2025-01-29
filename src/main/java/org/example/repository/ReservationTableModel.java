@@ -7,7 +7,7 @@ import javax.swing.table.AbstractTableModel;
 
 
 public class ReservationTableModel extends AbstractTableModel {
-    private final String[] columns = {"ID", "Stolik", "Od", "Do", "Klient"};
+    private final String[] columns = {"ID", "Stolik", "Od", "Do", "Klient","Danie"};
     private ReservationManager reservationManager;
 
     public ReservationTableModel(ReservationManager reservationManager) {
@@ -38,6 +38,7 @@ public class ReservationTableModel extends AbstractTableModel {
             case 2: return res.getStartTime().format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
             case 3: return res.getEndTime().format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
             case 4: return res.getCustomerName();
+            case 5: return res.getDishName();
             default: return null;
         }
     }
